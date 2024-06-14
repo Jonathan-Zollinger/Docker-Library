@@ -1,0 +1,8 @@
+name: prometheus 
+services:
+    prometheus:
+        ports:
+            - 9090:9090
+        volumes:
+            - ./:/etc/prometheus
+        image: prom/prometheus
