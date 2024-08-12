@@ -1,0 +1,18 @@
+---
+services:
+  soft-serve:
+    image: charmcli/soft-serve:latest
+    container_name: soft-serve
+    volumes:
+      - /path/to/data:/soft-serve
+    ports:
+      - 23231:23231
+      - 23232:23232
+      - 23233:23233
+      - 9418:9418
+    environment:
+      SOFT_SERVE_INITIAL_ADMIN_KEYS_FILE: /run/secrets/my-admin-key
+    restart: unless-stopped
+secrets:
+  my-admin-key:
+    file: ./my-publickey
