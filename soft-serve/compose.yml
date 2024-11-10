@@ -1,18 +1,40 @@
----
 services:
+  tailscale:
+    image: tailscale/tailscale:latest
+    hostname: tailcale-softserve
+    container_name: tailscale 
+    environment:
+      TS_AUTHKEY: 'tskey-auth-kpNkcRF56V11CNTRL-vEajgDR2f8P3TYuXuEfS8P71H6aPNVLF'
+      TS_EXTRA_ARGS: '--advertise-tags=tag:container'
+      TS_STATE_DIR: /var/lib/tailscale
+      TS_USERSPACE: false
+    cap_add:
+      - net_admin
+      - sys_module
+    secrets:
+      - ts_authkey 
+    restart: unless-stopped
   soft-serve:
     image: charmcli/soft-serve:latest
     container_name: soft-serve
+    depends_on: 
+     - tailscale
     volumes:
-      - /path/to/data:/soft-serve
-    ports:
-      - 23231:23231
-      - 23232:23232
-      - 23233:23233
-      - 9418:9418
+      - /git.pbu.lol:/soft-serve
+    # open ports are configured in tailscale
+#    ports:
+#      - '23231:23231'
+#      - '23232:23232'
+#      - '23233:23233'
+#      - '9418:9418'
+    network_mode: service:tailscale
     environment:
-      SOFT_SERVE_INITIAL_ADMIN_KEYS_FILE: /run/secrets/my-admin-key
+      SOFT_SERVE_INITIAL_ADMIN_KEYS: /run/secrets/initial_admin_keys
+    secrets:
+      - initial_admin_keys
     restart: unless-stopped
 secrets:
-  my-admin-key:
-    file: ./my-publickey
+  ts_authkey:
+    file: secrets/ts_authkey.txt
+  initial_admin_keys:
+    file: secrets/initial_admin_keys.txt
